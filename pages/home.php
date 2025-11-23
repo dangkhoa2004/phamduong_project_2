@@ -94,7 +94,9 @@ $agents_data = get_agents($conn);
                 <a href="<?php echo $project_folder ?? ''; ?>/chi-tiet/<?php echo $h['id']; ?>" class="real-estate-card">
                     <div style="position: relative;">
                         <img src="<?php echo $h['img']; ?>" class="re-img">
-                        <span class="re-tag"><?php echo $h['loc']; ?></span>
+                        <span style="position: absolute; bottom: 10px; left: 10px; background: rgba(0,0,0,0.7); color: white; padding: 4px 10px; font-size: 11px; border-radius: 4px;">
+                            <i class="fas fa-map-marker-alt"></i> <?php echo $h['loc']; ?>
+                        </span>
                     </div>
                     <div class="re-content">
                         <div class="re-title"><?php echo $h['name']; ?></div>
