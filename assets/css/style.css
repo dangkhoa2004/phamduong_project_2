@@ -1,0 +1,175 @@
+/* =========================================
+   1. VARIABLES & RESET
+   ========================================= */
+:root {
+    --primary: #0f5132;       /* Xanh rêu đậm sang trọng */
+    --primary-light: #198754; /* Xanh tươi hơn (hover) */
+    --accent: #d4ac0d;        /* Vàng Gold điểm nhấn */
+    --gray: #f4f6f8;          /* Màu nền xám nhạt */
+    --text: #333;             /* Màu chữ chính */
+    --radius: 8px;            /* Bo góc chuẩn */
+    --shadow: 0 4px 15px rgba(0,0,0,0.08); /* Đổ bóng nhẹ */
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; outline: none; font-family: 'Segoe UI', sans-serif; }
+body { background-color: var(--gray); color: var(--text); font-size: 15px; overflow-x: hidden; }
+a { text-decoration: none; color: inherit; transition: 0.3s; }
+ul { list-style: none; }
+img { max-width: 100%; height: auto; display: block; }
+
+/* Container giới hạn độ rộng web */
+.container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 15px; position: relative; }
+
+/* =========================================
+   2. HEADER & NAVIGATION
+   ========================================= */
+header { background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 1000; }
+
+.header-main { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; min-height: 70px; }
+
+/* Logo */
+.logo { font-size: 24px; font-weight: 900; color: var(--primary); text-transform: uppercase; display: flex; align-items: center; gap: 8px; }
+.logo span { color: var(--accent); }
+
+/* Khu vực bên phải Header (PC) */
+.header-right { display: flex; align-items: center; gap: 20px; flex-grow: 1; justify-content: flex-end; }
+
+/* Ô tìm kiếm trên Header */
+.search-box-header { display: flex; width: 400px; max-width: 100%; border: 1px solid #ddd; border-radius: 4px; overflow: hidden; }
+.search-box-header input { border: none; padding: 10px 15px; width: 100%; font-size: 14px; }
+.search-box-header button { border: none; background: var(--primary); color: white; padding: 0 20px; cursor: pointer; }
+.search-box-header button:hover { background: var(--primary-light); }
+
+/* Hotline */
+.hotline-header { text-align: right; line-height: 1.3; font-size: 14px; }
+.hotline-header strong { color: #d0021b; font-size: 17px; display: block; }
+
+/* Menu Toggle (Mobile Hamburger) - Mặc định ẩn */
+.menu-toggle { display: none; font-size: 26px; cursor: pointer; color: var(--primary); padding: 5px; }
+
+/* Thanh Menu Chính */
+.nav-bar { background: var(--primary); border-top: 1px solid rgba(255,255,255,0.1); }
+.nav-list { display: flex; }
+.nav-list li a { display: block; padding: 12px 20px; color: white; font-weight: 600; font-size: 14px; text-transform: uppercase; }
+.nav-list li a:hover { background: var(--primary-light); }
+.nav-list li a i { margin-right: 5px; }
+
+/* Class hỗ trợ ẩn hiện trên mobile */
+.show-on-mobile-only { display: none; }
+
+/* =========================================
+   3. INDEX PAGE STYLES
+   ========================================= */
+
+/* Hero Banner & Search Group */
+.hero-banner { position: relative; margin: 20px 0 40px; }
+.hero-content h1 { font-size: 32px; font-weight: 800; margin-bottom: 20px; text-shadow: 0 2px 5px rgba(0,0,0,0.6); }
+
+.banner-search-group { background: rgba(255,255,255,0.95); padding: 15px; border-radius: var(--radius); display: flex; gap: 10px; box-shadow: var(--shadow); }
+.banner-search-group select, .banner-search-group button { padding: 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; }
+.banner-search-group select { flex: 1; cursor: pointer; }
+.banner-search-group button:hover { opacity: 0.9; }
+
+/* Grid Khu vực (Region) */
+.region-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 15px; height: 350px; }
+.region-grid > div { height: 100%; width: 100%; } /* Đảm bảo ảnh full ô */
+
+/* Grid Sản phẩm (Real Estate Cards) */
+.product-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+
+.real-estate-card { background: white; border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); border: 1px solid #eee; transition: transform 0.3s; display: flex; flex-direction: column; }
+.real-estate-card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.15); }
+
+.re-img { height: 180px; width: 100%; object-fit: cover; }
+.re-content { padding: 15px; flex-grow: 1; display: flex; flex-direction: column; }
+.re-title { font-weight: bold; margin-bottom: 5px; color: #333; height: 42px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; font-size: 15px; line-height: 1.4; }
+.re-price { color: #d0021b; font-size: 17px; font-weight: 700; margin-bottom: 10px; }
+.re-info { margin-top: auto; border-top: 1px solid #eee; padding-top: 10px; font-size: 13px; color: #666; display: flex; justify-content: space-between; }
+.re-info i { color: var(--primary-light); margin-right: 4px; }
+
+/* Grid Dịch vụ (Service) */
+.service-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+.service-card { background: white; padding: 25px 20px; text-align: center; border-radius: var(--radius); border-bottom: 4px solid var(--primary); box-shadow: var(--shadow); height: 100%; }
+.service-icon { font-size: 35px; color: var(--primary); margin-bottom: 15px; }
+.service-card h4 { margin-bottom: 10px; font-size: 16px; }
+
+/* Grid Tin tức */
+.news-wrapper { display: grid; grid-template-columns: 2fr 1fr; gap: 30px; }
+
+/* =========================================
+   4. FOOTER (BULLETPROOF VERSION)
+   ========================================= */
+footer { background-color: #1c2331; color: #bbb; padding: 60px 0 20px; margin-top: 60px; font-size: 14px; border-top: 5px solid var(--accent); }
+
+.footer-grid { display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr; gap: 30px; }
+
+footer h4 { color: white; margin-bottom: 20px; font-size: 15px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; position: relative; padding-bottom: 10px; }
+footer h4::after { content: ''; position: absolute; left: 0; bottom: 0; width: 35px; height: 2px; background: var(--accent); }
+
+footer ul li { margin-bottom: 12px; }
+footer ul li a { color: #bbb; transition: 0.2s; }
+footer ul li a:hover { color: white; padding-left: 5px; color: var(--accent); }
+
+.social-icons a { margin-right: 15px; font-size: 20px; transition: 0.3s; }
+.social-icons a:hover { transform: scale(1.2); }
+
+/* =========================================
+   5. MEDIA QUERIES (RESPONSIVE)
+   ========================================= */
+
+/* --- TABLET (Dưới 992px) --- */
+@media (max-width: 992px) {
+    /* Layout */
+    .product-grid, .service-grid { grid-template-columns: repeat(2, 1fr); }
+    .footer-grid { grid-template-columns: 1fr 1fr; } /* Footer 2 cột */
+    .region-grid { display: flex; flex-direction: column; height: auto; }
+    .region-grid > div { height: 200px; width: 100%; margin-bottom: 10px; }
+    .news-wrapper { grid-template-columns: 1fr; }
+
+    /* Header Logic */
+    .header-right { display: none; } /* Ẩn search bar & hotline PC */
+    .menu-toggle { display: block; } /* Hiện nút Hamburger */
+    .show-on-mobile-only { display: block; } /* Hiện nút gọi Mobile */
+
+    /* Mobile Navigation (Slide Down) */
+    .nav-bar { 
+        display: none; /* Mặc định ẩn */
+        position: absolute; top: 100%; left: 0; width: 100%; 
+        background: white; border-top: 1px solid #eee; 
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1); 
+    }
+    .nav-bar.active { display: block; animation: slideDown 0.3s ease forwards; }
+    .nav-list { flex-direction: column; }
+    .nav-list li a { color: #333; border-bottom: 1px solid #f1f1f1; padding: 15px 20px; }
+    .nav-list li a:hover { background: #f9f9f9; color: var(--primary); }
+}
+
+/* --- MOBILE (Dưới 600px) --- */
+@media (max-width: 600px) {
+    /* Header & Banner */
+    .header-main { padding: 10px 0; }
+    .logo { font-size: 20px; }
+    .hero-content h1 { font-size: 22px; }
+    .hero-banner img { height: 500px !important; } /* Tăng chiều cao ảnh banner để chứa form */
+    
+    /* Search Form Stack */
+    .banner-search-group { flex-direction: column; }
+    .banner-search-group button { width: 100%; background: var(--accent); }
+
+    /* 1 Column Grids */
+    .product-grid, .service-grid { grid-template-columns: 1fr; }
+    
+    /* Footer an toàn (1 cột + canh giữa) */
+    .footer-grid { grid-template-columns: 1fr; text-align: center; gap: 40px; }
+    footer h4::after { left: 50%; transform: translateX(-50%); } /* Canh giữa gạch chân */
+    .social-icons { justify-content: center; }
+    
+    /* Form input full width */
+    form input, form textarea, form button { width: 100% !important; }
+}
+
+/* Keyframes Animation */
+@keyframes slideDown { 
+    from { opacity: 0; transform: translateY(-10px); } 
+    to { opacity: 1; transform: translateY(0); } 
+}
