@@ -1,110 +1,120 @@
 <?php
-// Mock Data MỞ RỘNG (Thêm nhiều trường thông tin kỹ thuật)
+/**
+ * ---------------------------------------------------------
+ * LOGIC PHP: TÌM KIẾM & XỬ LÝ DỮ LIỆU ĐỘNG
+ * ---------------------------------------------------------
+ */
+
+// 1. Gộp dữ liệu từ các nguồn (Nhà phố + Căn hộ) để tìm kiếm
+$all_products = array_merge($houses ?? [], $apartments ?? []);
+
+// 2. Tìm sản phẩm theo ID (Lấy từ Router)
+$found_item = null;
+foreach ($all_products as $item) {
+    if (isset($item['id']) && $item['id'] == $product_id) {
+        $found_item = $item;
+        break;
+    }
+}
+
+// 3. Nếu không tìm thấy (404)
+if ($found_item == null) {
+    echo "<div class='container' style='padding:100px 0; text-align:center'>
+            <h1 style='color:#ccc; font-size:80px'><i class='fas fa-search'></i></h1>
+            <h3>Không tìm thấy bất động sản!</h3>
+            <p>Tin đăng này có thể đã hết hạn hoặc đường dẫn không đúng.</p>
+            <a href='" . ($project_folder ?? '') . "/trang-chu' style='display:inline-block; margin-top:20px; padding:10px 20px; background:var(--primary); color:white; border-radius:4px; font-weight:bold'>Về trang chủ</a>
+          </div>";
+    return;
+}
+
+// 4. CHUẨN HÓA DỮ LIỆU (MAPPING)
+// Logic: $found_item['key'] ?? 'Chưa có'
+// Nghĩa là: Nếu trong data.php có thì lấy, không có thì ghi "Chưa có"
+
 $product = [
-    "title" => "Biệt thự đơn lập Vạn Phúc City, View trực diện sông Sài Gòn, Full nội thất Ý",
-    "price" => "45.5 Tỷ",
-    "price_unit" => "~ 130 triệu/m²",
-    "address" => "KĐT Vạn Phúc, Quốc lộ 13, P. Hiệp Bình Phước, TP. Thủ Đức",
-    "id" => "BDS-8899",
-    "date_posted" => "23/11/2025",
+    // --- THÔNG TIN CƠ BẢN (Luôn có từ data.php) ---
+    "id"            => $found_item['id'],
+    "title"         => $found_item['name'],
+    "price"         => $found_item['price'],
+    "address"       => isset($found_item['loc']) ? "Khu vực " . $found_item['loc'] : "Đang cập nhật",
+    "date_posted"   => date("d/m/Y"), // Giả lập ngày hiện tại
+    "price_unit"    => "Thương lượng", // Đơn vị giá
+
+    // --- THÔNG SỐ KỸ THUẬT (Dùng toán tử ?? để check) ---
+    "area"      => $found_item['area'] ?? 'Chưa có',
+    "use_area"  => $found_item['area'] ?? 'Chưa có', // Tạm dùng diện tích đất nếu ko có diện tích sàn
+    "dim"       => $found_item['dim'] ?? 'Chưa có',
+    "floors"    => $found_item['floors'] ?? 'Chưa có',
     
-    // --- THÔNG SỐ KỸ THUẬT CHI TIẾT ---
-    "area" => "350m²",          // Diện tích đất
-    "dim" => "15m x 23.5m",     // Kích thước
-    "use_area" => "800m²",      // Diện tích sử dụng (sàn)
-    "floors" => "1 Hầm, 4 Tầng",// Kết cấu tầng
-    "bed" => 5,
-    "bath" => 6,
-    "direction" => "Đông Nam",  // Hướng nhà
-    "balcony" => "Tây Bắc",     // Hướng ban công
-    "frontage" => "15m",        // Mặt tiền
-    "road" => "20m",            // Đường trước nhà
-    "legal" => "Sổ hồng riêng", // Pháp lý
-    "furniture" => "Cao cấp",   // Nội thất
+    "bed"       => $found_item['bed'] ?? 0,
+    "bath"      => $found_item['bath'] ?? 0,
     
-    "video_url" => "https://www.youtube.com/embed/LXb3EKWsInQ",
-    "amenities" => ["Hồ bơi vô cực", "Gara 2 ô tô", "Sân vườn BBQ", "Phòng Gym", "Thang máy kính", "Smart Home", "An ninh 24/7", "Phòng xông hơi"],
-    "nearby" => [
-        ["name" => "Trường Quốc tế Emasi", "dist" => "500m"],
-        ["name" => "Bệnh viện Vạn Phúc", "dist" => "1km"],
-        ["name" => "Sân bay Tân Sơn Nhất", "dist" => "6km"],
-        ["name" => "Trung tâm Quận 1", "dist" => "8km"]
-    ],
-    "desc" => "
-        <p>Cần bán gấp căn biệt thự đơn lập vị trí kim cương tại Vạn Phúc City. Nhà mới hoàn thiện, gia chủ định cư nước ngoài nên cần nhượng lại.</p>
-        <p><strong>1. Vị trí độc tôn:</strong> Nằm ngay mặt tiền công viên ven sông dài 3.4km, hưởng trọn luồng gió mát từ sông Sài Gòn.</p>
-        <p><strong>2. Kết cấu xây dựng:</strong></p>
-        <ul>
-            <li>Xây dựng: 1 Hầm, 1 Trệt, 3 Lầu, Sân thượng view pháo hoa.</li>
-            <li>Có thang máy kính nhập khẩu Ý từ hầm lên sân thượng.</li>
-            <li>Hầm rộng đỗ được 3 xe hơi và nhiều xe máy.</li>
-        </ul>
-        <p><strong>3. Nội thất bàn giao:</strong> Full nội thất cao cấp nhập khẩu (Sofa da bò tót, Bếp Bosch, Thiết bị vệ sinh Duravit, Máy lạnh âm trần Daikin...).</p>
-    ",
+    "direction" => $found_item['direction'] ?? 'Chưa có',
+    "balcony"   => $found_item['balcony'] ?? 'Chưa có',
+    "frontage"  => $found_item['frontage'] ?? 'Chưa có',
+    "road"      => $found_item['road'] ?? 'Chưa có',
+    "legal"     => $found_item['legal'] ?? 'Đang chờ sổ',
+    "furniture" => $found_item['furniture'] ?? 'Thỏa thuận',
+
+    // --- HÌNH ẢNH & MEDIA ---
+    // Nếu data gốc chỉ có 1 ảnh, ta nhân bản lên để Gallery không bị lỗi
     "images" => [
-        "https://images.unsplash.com/photo-1613977257363-707ba9348227?w=1200&q=90",
-        "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=90",
-        "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=800&q=90",
-        "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800&q=90",
-        "https://images.unsplash.com/photo-1600585154526-990dced4db0d?w=800&q=90"
+        $found_item['img'], 
+        $found_item['img'], // Ảnh phụ 1 (dùng lại ảnh chính)
+        $found_item['img']  // Ảnh phụ 2
     ],
+    "video_url" => $found_item['video_url'] ?? "https://www.youtube.com/embed/LXb3EKWsInQ", // Video mặc định nếu thiếu
+
+    // --- MÔ TẢ & TIỆN ÍCH ---
+    "desc" => $found_item['desc'] ?? "<p>Hiện tại chưa có mô tả chi tiết cho bất động sản <strong>{$found_item['name']}</strong>. Quý khách vui lòng liên hệ trực tiếp để nhận thông tin mới nhất.</p>",
+    
+    "amenities" => $found_item['amenities'] ?? ["Đang cập nhật tiện ích..."],
+    
+    "nearby" => $found_item['nearby'] ?? [
+        ["name" => "Trung tâm hành chính", "dist" => "Gần bên"],
+        ["name" => "Chợ / Siêu thị", "dist" => "500m"]
+    ],
+
+    // --- MÔI GIỚI ---
     "agent" => [
-        "name" => "Trần Văn Chuyên",
-        "phone" => "0909.888.999",
-        "img" => "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=200&q=80",
-        "zalo" => "http://zalo.me/0909888999"
+        "name"  => "Hotline Hỗ Trợ",
+        "phone" => "0389.616.946",
+        "img"   => "https://images.unsplash.com/photo-1557862921-37829c790f19?w=200&q=80",
+        "zalo"  => "#"
     ]
 ];
 
-// Lấy sản phẩm liên quan từ data chung
-$related_products = array_slice($houses, 0, 4);
+// Lấy sản phẩm liên quan (Trừ sản phẩm đang xem)
+$related_products = [];
+foreach($houses as $h) {
+    if($h['id'] != $product['id']) {
+        $related_products[] = $h;
+    }
+    if(count($related_products) >= 4) break;
+}
 ?>
 
 <style>
     /* CSS MỚI CHO BẢNG THÔNG SỐ (SPECS GRID) */
-    .specs-section {
-        background: #f8f9fa;
-        border: 1px solid #eee;
-        border-radius: 12px;
-        padding: 25px;
-        margin: 25px 0;
-    }
-    .specs-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr); /* 3 Cột */
-        gap: 25px;
-        row-gap: 30px;
-    }
-    .spec-item-v2 {
-        display: flex;
-        align-items: flex-start;
-        gap: 15px;
-    }
-    .spec-icon-v2 {
-        width: 40px;
-        height: 40px;
-        background: white;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: var(--primary);
-        font-size: 18px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        flex-shrink: 0;
-    }
+    .specs-section { background: #f8f9fa; border: 1px solid #eee; border-radius: 12px; padding: 25px; margin: 25px 0; }
+    .specs-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px; row-gap: 30px; }
+    .spec-item-v2 { display: flex; align-items: flex-start; gap: 15px; }
+    .spec-icon-v2 { width: 40px; height: 40px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--primary); font-size: 18px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); flex-shrink: 0; }
     .spec-content-v2 { display: flex; flex-direction: column; }
     .spec-label { font-size: 13px; color: #777; margin-bottom: 4px; }
     .spec-value { font-size: 15px; font-weight: 700; color: #222; }
 
-    /* Layout & Gallery (Giữ nguyên từ version trước) */
+    /* Helper class để làm mờ chữ "Chưa có" */
+    .text-muted-custom { color: #999 !important; font-weight: normal !important; font-style: italic; }
+
+    /* Các CSS cũ giữ nguyên */
     .photo-gallery { display: grid; grid-template-columns: 2fr 1fr; gap: 10px; height: 450px; border-radius: 12px; overflow: hidden; margin-bottom: 25px; cursor: pointer; }
     .photo-main img, .photo-sub img { width: 100%; height: 100%; object-fit: cover; transition: 0.3s; }
     .photo-sub { display: grid; grid-template-rows: 1fr 1fr; gap: 10px; }
     .photo-gallery img:hover { transform: scale(1.02); filter: brightness(1.1); }
     
     .detail-container { display: grid; grid-template-columns: 2.5fr 1fr; gap: 40px; }
-    
     .prop-header { border-bottom: 1px solid #eee; padding-bottom: 20px; margin-bottom: 20px; }
     .prop-title { font-size: 26px; font-weight: 800; color: #222; margin-bottom: 10px; line-height: 1.3; }
     .prop-price { font-size: 28px; font-weight: bold; color: #d0021b; }
@@ -115,7 +125,7 @@ $related_products = array_slice($houses, 0, 4);
     
     .amenity-list { display: flex; flex-wrap: wrap; gap: 10px; }
     .amenity-tag { background: #fff; border: 1px solid #ddd; padding: 8px 15px; border-radius: 30px; font-size: 13px; color: #555; display: flex; align-items: center; gap: 8px; }
-    .amenity-tag i { color: #28a745; } /* Icon xanh lá */
+    .amenity-tag i { color: #28a745; }
 
     .nearby-table { width: 100%; border-collapse: collapse; font-size: 14px; }
     .nearby-table td { padding: 10px 0; border-bottom: 1px dashed #eee; }
@@ -126,24 +136,15 @@ $related_products = array_slice($houses, 0, 4);
     .btn-call { background: var(--primary); color: white; border: none; }
     .btn-zalo { background: #0068ff; color: white; border: none; }
 
-    /* Responsive */
-    @media (max-width: 992px) {
-        .detail-container { grid-template-columns: 1fr; }
-        .specs-grid { grid-template-columns: repeat(2, 1fr); } /* Tablet 2 cột */
-    }
-    @media (max-width: 600px) {
-        .photo-gallery { height: 250px; grid-template-columns: 1fr; }
-        .photo-sub { display: none; }
-        .specs-grid { grid-template-columns: 1fr; } /* Mobile 1 cột */
-    }
+    @media (max-width: 992px) { .detail-container { grid-template-columns: 1fr; } .specs-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 600px) { .photo-gallery { height: 250px; grid-template-columns: 1fr; } .photo-sub { display: none; } .specs-grid { grid-template-columns: 1fr; } }
 </style>
 
 <div class="container">
     
     <div style="margin: 20px 0; font-size: 13px; color: #888;">
-        <a href="trang-chu">Trang chủ</a> <span style="margin:0 5px">/</span> 
-        <a href="#">Bán biệt thự</a> <span style="margin:0 5px">/</span> 
-        <span style="color: #333;">Mã tin: <?php echo $product['id']; ?></span>
+        <a href="<?php echo $project_folder ?? ''; ?>/trang-chu">Trang chủ</a> <span style="margin:0 5px">/</span> 
+        <span style="color: #333;">Chi tiết: <?php echo $product['id']; ?></span>
     </div>
 
     <div class="photo-gallery">
@@ -167,7 +168,7 @@ $related_products = array_slice($houses, 0, 4);
                         <?php echo $product['price']; ?> 
                         <span style="font-size: 15px; color: #555; font-weight: normal; margin-left: 10px;">(<?php echo $product['price_unit']; ?>)</span>
                     </div>
-                    <div style="font-size: 13px; color: #999;">Ngày đăng: <?php echo $product['date_posted']; ?></div>
+                    <div style="font-size: 13px; color: #999;">Cập nhật: <?php echo $product['date_posted']; ?></div>
                 </div>
             </div>
 
@@ -178,15 +179,32 @@ $related_products = array_slice($houses, 0, 4);
                         
                         <div class="spec-item-v2">
                             <div class="spec-icon-v2"><i class="fas fa-ruler-combined"></i></div>
-                            <div class="spec-content-v2"><span class="spec-label">Diện tích đất</span><span class="spec-value"><?php echo $product['area']; ?></span></div>
+                            <div class="spec-content-v2">
+                                <span class="spec-label">Diện tích đất</span>
+                                <span class="spec-value <?php echo $product['area'] == 'Chưa có' ? 'text-muted-custom' : ''; ?>">
+                                    <?php echo $product['area']; ?>
+                                </span>
+                            </div>
                         </div>
+
                         <div class="spec-item-v2">
                             <div class="spec-icon-v2"><i class="fas fa-vector-square"></i></div>
-                            <div class="spec-content-v2"><span class="spec-label">Diện tích sàn</span><span class="spec-value"><?php echo $product['use_area']; ?></span></div>
+                            <div class="spec-content-v2">
+                                <span class="spec-label">Diện tích sử dụng</span>
+                                <span class="spec-value <?php echo $product['use_area'] == 'Chưa có' ? 'text-muted-custom' : ''; ?>">
+                                    <?php echo $product['use_area']; ?>
+                                </span>
+                            </div>
                         </div>
+
                         <div class="spec-item-v2">
                             <div class="spec-icon-v2"><i class="fas fa-expand"></i></div>
-                            <div class="spec-content-v2"><span class="spec-label">Kích thước</span><span class="spec-value"><?php echo $product['dim']; ?></span></div>
+                            <div class="spec-content-v2">
+                                <span class="spec-label">Kích thước</span>
+                                <span class="spec-value <?php echo $product['dim'] == 'Chưa có' ? 'text-muted-custom' : ''; ?>">
+                                    <?php echo $product['dim']; ?>
+                                </span>
+                            </div>
                         </div>
 
                         <div class="spec-item-v2">
@@ -197,35 +215,73 @@ $related_products = array_slice($houses, 0, 4);
                             <div class="spec-icon-v2"><i class="fas fa-bath"></i></div>
                             <div class="spec-content-v2"><span class="spec-label">Phòng tắm</span><span class="spec-value"><?php echo $product['bath']; ?> phòng</span></div>
                         </div>
+
                         <div class="spec-item-v2">
                             <div class="spec-icon-v2"><i class="fas fa-layer-group"></i></div>
-                            <div class="spec-content-v2"><span class="spec-label">Số tầng</span><span class="spec-value"><?php echo $product['floors']; ?></span></div>
+                            <div class="spec-content-v2">
+                                <span class="spec-label">Kết cấu</span>
+                                <span class="spec-value <?php echo $product['floors'] == 'Chưa có' ? 'text-muted-custom' : ''; ?>">
+                                    <?php echo $product['floors']; ?>
+                                </span>
+                            </div>
                         </div>
 
                         <div class="spec-item-v2">
                             <div class="spec-icon-v2"><i class="fas fa-compass"></i></div>
-                            <div class="spec-content-v2"><span class="spec-label">Hướng nhà</span><span class="spec-value"><?php echo $product['direction']; ?></span></div>
+                            <div class="spec-content-v2">
+                                <span class="spec-label">Hướng nhà</span>
+                                <span class="spec-value <?php echo $product['direction'] == 'Chưa có' ? 'text-muted-custom' : ''; ?>">
+                                    <?php echo $product['direction']; ?>
+                                </span>
+                            </div>
                         </div>
+
                         <div class="spec-item-v2">
                             <div class="spec-icon-v2"><i class="far fa-compass"></i></div>
-                            <div class="spec-content-v2"><span class="spec-label">Hướng ban công</span><span class="spec-value"><?php echo $product['balcony']; ?></span></div>
+                            <div class="spec-content-v2">
+                                <span class="spec-label">Hướng ban công</span>
+                                <span class="spec-value <?php echo $product['balcony'] == 'Chưa có' ? 'text-muted-custom' : ''; ?>">
+                                    <?php echo $product['balcony']; ?>
+                                </span>
+                            </div>
                         </div>
+
                         <div class="spec-item-v2">
                             <div class="spec-icon-v2"><i class="fas fa-file-contract"></i></div>
-                            <div class="spec-content-v2"><span class="spec-label">Pháp lý</span><span class="spec-value"><?php echo $product['legal']; ?></span></div>
+                            <div class="spec-content-v2">
+                                <span class="spec-label">Pháp lý</span>
+                                <span class="spec-value <?php echo $product['legal'] == 'Chưa có' ? 'text-muted-custom' : ''; ?>">
+                                    <?php echo $product['legal']; ?>
+                                </span>
+                            </div>
                         </div>
 
                          <div class="spec-item-v2">
                             <div class="spec-icon-v2"><i class="fas fa-road"></i></div>
-                            <div class="spec-content-v2"><span class="spec-label">Đường trước nhà</span><span class="spec-value"><?php echo $product['road']; ?></span></div>
+                            <div class="spec-content-v2">
+                                <span class="spec-label">Đường trước nhà</span>
+                                <span class="spec-value <?php echo $product['road'] == 'Chưa có' ? 'text-muted-custom' : ''; ?>">
+                                    <?php echo $product['road']; ?>
+                                </span>
+                            </div>
                         </div>
                         <div class="spec-item-v2">
                             <div class="spec-icon-v2"><i class="fas fa-arrows-alt-h"></i></div>
-                            <div class="spec-content-v2"><span class="spec-label">Mặt tiền</span><span class="spec-value"><?php echo $product['frontage']; ?></span></div>
+                            <div class="spec-content-v2">
+                                <span class="spec-label">Mặt tiền</span>
+                                <span class="spec-value <?php echo $product['frontage'] == 'Chưa có' ? 'text-muted-custom' : ''; ?>">
+                                    <?php echo $product['frontage']; ?>
+                                </span>
+                            </div>
                         </div>
                         <div class="spec-item-v2">
                             <div class="spec-icon-v2"><i class="fas fa-couch"></i></div>
-                            <div class="spec-content-v2"><span class="spec-label">Nội thất</span><span class="spec-value"><?php echo $product['furniture']; ?></span></div>
+                            <div class="spec-content-v2">
+                                <span class="spec-label">Nội thất</span>
+                                <span class="spec-value <?php echo $product['furniture'] == 'Chưa có' ? 'text-muted-custom' : ''; ?>">
+                                    <?php echo $product['furniture']; ?>
+                                </span>
+                            </div>
                         </div>
 
                     </div>
@@ -233,7 +289,7 @@ $related_products = array_slice($houses, 0, 4);
             </div>
 
             <div class="content-block">
-                <h3 class="block-title">Tiện ích đặc quyền</h3>
+                <h3 class="block-title">Tiện ích</h3>
                 <div class="amenity-list">
                     <?php foreach($product['amenities'] as $am): ?>
                         <div class="amenity-tag"><i class="fas fa-check-circle"></i> <?php echo $am; ?></div>
@@ -256,7 +312,7 @@ $related_products = array_slice($houses, 0, 4);
                     </div>
                 </div>
                 <div>
-                    <h3 class="block-title">Vị trí & Tiện ích ngoại khu</h3>
+                    <h3 class="block-title">Tiện ích ngoại khu</h3>
                     <table class="nearby-table">
                         <?php foreach($product['nearby'] as $nb): ?>
                         <tr>
@@ -279,8 +335,8 @@ $related_products = array_slice($houses, 0, 4);
                     <i class="fas fa-star" style="color: gold"></i> Môi giới chuyên nghiệp
                 </div>
                 
-                <a href="tel:0909888999" class="btn-action btn-call">
-                    <i class="fas fa-phone-alt"></i> Gọi 0909.888.999
+                <a href="tel:<?php echo str_replace('.', '', $product['agent']['phone']); ?>" class="btn-action btn-call">
+                    <i class="fas fa-phone-alt"></i> Gọi <?php echo $product['agent']['phone']; ?>
                 </a>
                 <a href="<?php echo $product['agent']['zalo']; ?>" class="btn-action btn-zalo">
                     <i class="fas fa-comment-dots"></i> Chat Zalo
@@ -303,7 +359,7 @@ $related_products = array_slice($houses, 0, 4);
         <h3 style="border-left: 5px solid var(--accent); padding-left: 10px; color: #333; margin-bottom: 25px;">BẤT ĐỘNG SẢN TƯƠNG TỰ</h3>
         <div class="product-grid">
             <?php foreach($related_products as $h): ?>
-            <div class="real-estate-card">
+            <a href="<?php echo $project_folder ?? ''; ?>/chi-tiet/<?php echo $h['id']; ?>" class="real-estate-card" style="display: block; text-decoration: none; color: inherit;">
                 <div style="position: relative;">
                     <img src="<?php echo $h['img']; ?>" class="re-img">
                     <span style="position: absolute; top: 10px; right: 10px; background: #d0021b; color: white; padding: 2px 8px; font-size: 11px; border-radius: 3px;">HOT</span>
@@ -317,7 +373,7 @@ $related_products = array_slice($houses, 0, 4);
                         <span><i class="fas fa-bath"></i> <?php echo $h['bath']; ?></span>
                     </div>
                 </div>
-            </div>
+            </a>
             <?php endforeach; ?>
         </div>
     </div>

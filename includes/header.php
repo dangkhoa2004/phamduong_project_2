@@ -5,7 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nhà Đất Phạm Dương</title>
-    <link rel="stylesheet" href="assets/css/style.css">
+
+    <link rel="stylesheet" href="<?php echo $project_folder ?? ''; ?>/assets/css/style.css">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 
@@ -42,15 +44,9 @@
             <div class="container">
                 <ul class="nav-list">
                     <li><a href="<?php echo $project_folder ?? ''; ?>/trang-chu"><i class="fas fa-home"></i> Trang chủ</a></li>
-
                     <li><a href="<?php echo $project_folder ?? ''; ?>/nha-dat-ban"><i class="fas fa-building"></i> Nhà đất bán</a></li>
-
                     <li><a href="<?php echo $project_folder ?? ''; ?>/nha-dat-thue"><i class="fas fa-key"></i> Nhà đất cho thuê</a></li>
-
                     <li><a href="<?php echo $project_folder ?? ''; ?>/dich-vu"><i class="fas fa-file-contract"></i> Dịch vụ pháp lý</a></li>
-
-                    <li><a href="<?php echo $project_folder ?? ''; ?>/do-dac"><i class="fas fa-map-marked-alt"></i> Đo đạc bản đồ</a></li>
-
                     <li><a href="<?php echo $project_folder ?? ''; ?>/tin-tuc"><i class="fas fa-newspaper"></i> Tin tức</a></li>
                 </ul>
             </div>

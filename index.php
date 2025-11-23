@@ -1,51 +1,45 @@
 <?php
-// 1. Load các thành phần chung
 require_once 'includes/config.php';
 require_once 'includes/data.php';
 
-// 2. Lấy đường dẫn URL hiện tại
-// Ví dụ: http://localhost/my_project/gioi-thieu -> $request_uri = '/my_project/gioi-thieu'
 $request_uri = $_SERVER['REQUEST_URI'];
-
-// 3. Xử lý đường dẫn (Loại bỏ thư mục gốc nếu chạy ở localhost/my_project)
-// Nếu bạn chạy trực tiếp domain (vd: datviet.com) thì không cần dòng str_replace này phức tạp
-$project_folder = ''; // Đổi tên này nếu thư mục bạn đặt tên khác
+$project_folder = ''; // Đổi tên thư mục nếu cần
 $router = str_replace($project_folder, '', $request_uri);
+$router = strtok($router, '?'); // Bỏ query string
 
-// Loại bỏ query string (ví dụ ?id=1) để lấy đúng đường dẫn sạch
-$router = strtok($router, '?');
-
-// 4. Load Header
-require_once 'includes/header.php';
-
-// 5. ĐIỀU HƯỚNG (ROUTER SWITCH)
-// Dựa vào $router để quyết định nạp file nào trong thư mục pages/
-switch ($router) {
-    case '/':
-    case '/trang-chu':
-    case '/home':
-        require_once 'pages/home.php';
-        break;
-
-    case '/chi-tiet':
-    case '/san-pham':
-        require_once 'pages/detail.php';
-        break;
-
-    case '/lien-he':
-        // Bạn có thể tạo file pages/contact.php
-        echo "<div class='container' style='padding:50px 0'><h2>Trang liên hệ đang xây dựng...</h2></div>";
-        break;
-
-    default:
-        // Trang 404
-        echo "<div class='container' style='padding:50px 0; text-align:center'>
-                <h1 style='color:red; font-size: 50px'>404</h1>
-                <h3>Trang không tồn tại!</h3>
-                <a href='trang-chu'>Quay về trang chủ</a>
-              </div>";
-        break;
+// ROUTER XỬ LÝ LOGIC
+// 1. Kiểm tra Trang chủ
+if ($router == '/' || $router == '/trang-chu' || $router == '/home') {
+    require_once 'includes/header.php';
+    require_once 'pages/home.php';
+    require_once 'includes/footer.php';
 }
 
-// 6. Load Footer
-require_once 'includes/footer.php';
+// 2. Kiểm tra trang Chi tiết (Dạng /chi-tiet/nhapho-01)
+// preg_match sẽ kiểm tra xem đường dẫn có bắt đầu bằng /chi-tiet/ hay không
+elseif (preg_match('#^/chi-tiet/(.+)$#', $router, $matches)) {
+    // $matches[1] chính là cái ID chúng ta cần (VD: nhapho-01)
+    $product_id = $matches[1];
+
+    require_once 'includes/header.php';
+    require_once 'pages/detail.php'; // Gọi trang detail, trang này sẽ dùng biến $product_id
+    require_once 'includes/footer.php';
+}
+
+// 3. Các trang khác
+elseif ($router == '/lien-he') {
+    require_once 'includes/header.php';
+    echo "<div class='container' style='padding:100px 0; text-align:center'><h2>Trang liên hệ</h2></div>";
+    require_once 'includes/footer.php';
+}
+
+// 4. Trang 404
+else {
+    require_once 'includes/header.php';
+    echo "<div class='container' style='padding:100px 0; text-align:center'>
+            <h1 style='color:red; font-size:60px'>404</h1>
+            <h3>Không tìm thấy trang yêu cầu!</h3>
+            <a href='$project_folder/trang-chu'>Về trang chủ</a>
+          </div>";
+    require_once 'includes/footer.php';
+}
