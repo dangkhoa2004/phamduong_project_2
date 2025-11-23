@@ -41,9 +41,16 @@ $agents_data = get_agents($conn);
     </section>
 
     <section style="margin-bottom: 60px;">
-        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.08);">
+        <div style="display: flex; flex-wrap: wrap; justify-content: space-around; gap: 20px; background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.08);">
             <?php foreach ($stats_data as $s): ?>
-                <div style="text-align: center; border: none; box-shadow: none; background: transparent;">
+                <div style="
+                text-align: center;
+                border: none;
+                box-shadow: none;
+                background: transparent;
+                flex-basis: calc(25% - 20px); 
+                min-width: 150px; 
+            ">
                     <div style="font-size: 28px; font-weight: 900; color: #d4ac0d;"><?php echo $s['num']; ?></div>
                     <div style="color: #666; font-weight: 600; text-transform: uppercase; font-size: 13px;"><?php echo $s['label']; ?></div>
                 </div>
