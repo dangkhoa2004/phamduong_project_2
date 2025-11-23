@@ -1,18 +1,25 @@
 <?php
-// Bật thông báo lỗi (Chỉ dùng khi đang lập trình, tắt khi public web)
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
+/**
+ * ---------------------------------------------------------
+ * CẤU HÌNH HỆ THỐNG TOÀN CỤC (GLOBAL CONFIGURATIONS)
+ * ---------------------------------------------------------
+ * File này chỉ được gọi DUY NHẤT một lần trong index.php.
+ */
 
-// Giả lập biến tiêu đề chung
-define('SITE_NAME', 'Dự án PHP Đầu Tay');
+// 1. CẤU HÌNH ĐƯỜNG DẪN GỐC CỦA DỰ ÁN
+// Hằng số này giúp tạo các đường dẫn tuyệt đối an toàn (ví dụ: cho CSS, ảnh, và các liên kết).
+// PHẢI KHỚP VỚI TÊN THƯ MỤNG CỦA BẠN TRÊN XAMPP.
+// Dựa trên lỗi trước đó, tên thư mục của bạn là 'phamduong_project_2'.
+define('PROJECT_FOLDER', ''); 
 
-// Kết nối Database (Ví dụ mẫu - chưa cần dùng ngay)
-/*
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "ten_database";
-$conn = new mysqli($servername, $username, $password, $dbname);
-*/
+// 2. CẤU HÌNH KẾT NỐI CSDL (Tùy chọn, nếu bạn không muốn đặt trong db.php)
+// define('DB_SERVER', 'localhost');
+// define('DB_USERNAME', 'root');
+// define('DB_PASSWORD', '');
+// define('DB_NAME', 'phamduongland_db');
+
+// 3. CÁC HẰNG SỐ CHUNG KHÁC
+// define('SITE_NAME', 'Phạm Dương Land');
+// define('MAX_PRODUCTS_PER_PAGE', 12);
+
 ?>

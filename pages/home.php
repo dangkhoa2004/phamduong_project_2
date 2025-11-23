@@ -1,7 +1,10 @@
 <?php
-require_once 'includes/config.php';
-require_once 'includes/data.php'; // LOAD DỮ LIỆU TỪ FILE RIÊNG
-require_once 'includes/header.php';
+$houses_data = get_products_by_type($conn, 'house');
+$apartments_data = get_products_by_type($conn, 'apartment');
+$stats_data = get_stats($conn);
+$services_data = get_services($conn);
+$reviews_data = get_reviews($conn);
+$agents_data = get_agents($conn);
 ?>
 
 <div class="container">
@@ -38,11 +41,11 @@ require_once 'includes/header.php';
     </section>
 
     <section style="margin-bottom: 60px;">
-        <div class="service-grid">
-            <?php foreach ($stats as $st): ?>
-                <div class="service-card" style="border: none; box-shadow: none; background: transparent;">
-                    <div style="font-size: 42px; font-weight: 800; color: var(--primary);"><?php echo $st['num']; ?></div>
-                    <div style="color: #666; font-weight: 600; text-transform: uppercase; font-size: 13px;"><?php echo $st['label']; ?></div>
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.08);">
+            <?php foreach ($stats_data as $s): ?>
+                <div style="text-align: center; border: none; box-shadow: none; background: transparent;">
+                    <div style="font-size: 28px; font-weight: 900; color: #d4ac0d;"><?php echo $s['num']; ?></div>
+                    <div style="color: #666; font-weight: 600; text-transform: uppercase; font-size: 13px;"><?php echo $s['label']; ?></div>
                 </div>
             <?php endforeach; ?>
         </div>
@@ -87,11 +90,11 @@ require_once 'includes/header.php';
             <a href="#" style="color: var(--primary); font-weight: 600;">Xem tất cả <i class="fas fa-arrow-right"></i></a>
         </div>
         <div class="product-grid">
-            <?php foreach ($houses as $h): ?>
-                <a href="<?php echo $project_folder ?? ''; ?>/chi-tiet/<?php echo $h['id']; ?>" class="real-estate-card" style="display: block; text-decoration: none; color: inherit;">
+            <?php foreach ($houses_data as $h): ?>
+                <a href="<?php echo $project_folder ?? ''; ?>/chi-tiet/<?php echo $h['id']; ?>" class="real-estate-card">
                     <div style="position: relative;">
                         <img src="<?php echo $h['img']; ?>" class="re-img">
-                        <span style="position: absolute; top: 10px; right: 10px; background: #d0021b; color: white; padding: 3px 10px; font-size: 11px; border-radius: 3px; font-weight: bold;">VIP</span>
+                        <span class="re-tag"><?php echo $h['loc']; ?></span>
                     </div>
                     <div class="re-content">
                         <div class="re-title"><?php echo $h['name']; ?></div>
@@ -118,11 +121,11 @@ require_once 'includes/header.php';
     <section style="margin-bottom: 60px;">
         <h2 style="text-align: center; margin-bottom: 30px; color: var(--primary); text-transform: uppercase; font-weight: 800;">Giải Pháp Pháp Lý Toàn Diện</h2>
         <div class="service-grid">
-            <?php foreach ($services as $s): ?>
+            <?php foreach ($services_data as $s): ?>
                 <div class="service-card">
                     <div class="service-icon"><i class="fas <?php echo $s['icon']; ?>"></i></div>
                     <h4 style="margin-bottom: 10px; font-size: 16px;"><?php echo $s['title']; ?></h4>
-                    <p style="font-size: 13px; color: #666; line-height: 1.6; margin-bottom: 15px;"><?php echo $s['desc']; ?></p>
+                    <p style="font-size: 13px; color: #666; line-height: 1.6; margin-bottom: 15px;"><?php echo $s['description']; ?></p>
                     <a href="#" style="color:var(--accent); font-weight: 600; font-size: 13px;">TƯ VẤN NGAY &rarr;</a>
                 </div>
             <?php endforeach; ?>
@@ -135,7 +138,7 @@ require_once 'includes/header.php';
             <a href="#" style="color: var(--primary); font-weight: 600;">Xem tất cả <i class="fas fa-arrow-right"></i></a>
         </div>
         <div class="product-grid">
-            <?php foreach ($apartments as $a): ?>
+            <?php foreach ($apartments_data as $a): ?>
                 <a href="<?php echo $project_folder ?? ''; ?>/chi-tiet/<?php echo $a['id']; ?>" class="real-estate-card" style="display: block; text-decoration: none; color: inherit;">
                     <div style="position: relative;">
                         <img src="<?php echo $a['img']; ?>" class="re-img">
@@ -155,6 +158,7 @@ require_once 'includes/header.php';
             <?php endforeach; ?>
         </div>
     </section>
+
     <section style="margin-bottom: 60px; background-image: url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&q=80'); background-size: cover; background-attachment: fixed; padding: 80px 20px; text-align: center; border-radius: 8px; position: relative;">
         <div style="background: rgba(15, 81, 50, 0.85); position: absolute; top:0; left:0; width:100%; height:100%; border-radius: 8px;"></div>
         <div style="position: relative; z-index: 2; color: white;">
@@ -167,7 +171,7 @@ require_once 'includes/header.php';
     <section style="margin-bottom: 60px;">
         <h2 style="text-align: center; margin-bottom: 30px; font-weight: 800;">ĐỘI NGŨ CHUYÊN GIA</h2>
         <div class="product-grid">
-            <?php foreach ($agents as $ag): ?>
+            <?php foreach ($agents_data as $ag): ?>
                 <div class="real-estate-card" style="text-align: center; padding: 20px 0;">
                     <div style="width: 120px; height: 120px; margin: 0 auto 15px; border-radius: 50%; overflow: hidden; border: 3px solid var(--accent);">
                         <img src="<?php echo $ag['img']; ?>" style="width: 100%; height: 100%; object-fit: cover;">
@@ -183,21 +187,21 @@ require_once 'includes/header.php';
     <section style="margin-bottom: 60px;">
         <h2 style="text-align: center; margin-bottom: 30px;">Khách hàng nói gì về chúng tôi?</h2>
         <div class="service-grid">
-            <?php foreach ($reviews as $r): ?>
+            <?php foreach ($reviews_data as $r): ?>
                 <div class="service-card" style="text-align: left; border-bottom: 4px solid #eee; transition: 0.3s;">
                     <div style="color: #f59e0b; margin-bottom: 15px;">
                         <?php for ($i = 0; $i < $r['star']; $i++) echo '<i class="fas fa-star"></i>'; ?>
                     </div>
                     <p style="font-size: 14px; font-style: italic; color: #555; margin-bottom: 20px; min-height: 70px; line-height: 1.6;">
-                        "<?php echo $r['text']; ?>"
+                        "<?php echo $r['review_text']; ?>"
                     </p>
                     <div style="display: flex; align-items: center; gap: 10px;">
                         <div style="width: 40px; height: 40px; background: #ddd; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #555;">
-                            <?php echo substr($r['user'], 0, 1); ?>
+                            <?php echo substr($r['user_name'], 0, 1); ?>
                         </div>
                         <div>
-                            <div style="font-weight: bold; color: var(--primary); font-size: 14px;"><?php echo $r['user']; ?></div>
-                            <div style="font-size: 12px; color: #999;"><?php echo $r['role']; ?></div>
+                            <div style="font-weight: bold; color: var(--primary); font-size: 14px;"><?php echo $r['user_name']; ?></div>
+                            <div style="font-size: 12px; color: #999;"><?php echo $r['user_role']; ?></div>
                         </div>
                     </div>
                 </div>
@@ -263,5 +267,3 @@ require_once 'includes/header.php';
     </div>
 
 </div>
-
-<?php require_once 'includes/footer.php'; ?>

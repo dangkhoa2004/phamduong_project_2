@@ -42,7 +42,6 @@
                     <div class="social-icons" style="font-size: 24px; display:flex; gap: 15px;">
                         <a href="#"><i class="fab fa-facebook" style="color:#1877f2"></i></a>
                         <a href="#"><i class="fab fa-youtube" style="color:#ff0000"></i></a>
-                        <a href="#"><i class="fab fa-zalo" style="color:#0068ff"></i></a>
                         <a href="#"><i class="fab fa-tiktok" style="color:white"></i></a>
                     </div>
                 </div>

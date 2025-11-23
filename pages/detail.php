@@ -1,102 +1,93 @@
 <?php
 /**
  * ---------------------------------------------------------
- * LOGIC PHP: TÌM KIẾM & XỬ LÝ DỮ LIỆU ĐỘNG
+ * LOGIC PHP: TRUY VẤN DỮ LIỆU TỪ CSDL & XỬ LÝ FALLBACK
  * ---------------------------------------------------------
  */
 
-// 1. Gộp dữ liệu từ các nguồn (Nhà phố + Căn hộ) để tìm kiếm
-$all_products = array_merge($houses ?? [], $apartments ?? []);
+// Biến $product_id (ID sản phẩm) và $conn (Kết nối CSDL) đã có sẵn từ index.php
 
-// 2. Tìm sản phẩm theo ID (Lấy từ Router)
-$found_item = null;
-foreach ($all_products as $item) {
-    if (isset($item['id']) && $item['id'] == $product_id) {
-        $found_item = $item;
-        break;
-    }
-}
+// 1. ⭐️ TRUY VẤN DỮ LIỆU TỪ CSDL ⭐️
+// Hàm get_product_details() được định nghĩa trong includes/db.php
+$product_raw = get_product_details($conn, $product_id); 
 
-// 3. Nếu không tìm thấy (404)
-if ($found_item == null) {
+// 2. Kiểm tra nếu không tìm thấy (404)
+if (empty($product_raw)) {
     echo "<div class='container' style='padding:100px 0; text-align:center'>
             <h1 style='color:#ccc; font-size:80px'><i class='fas fa-search'></i></h1>
             <h3>Không tìm thấy bất động sản!</h3>
-            <p>Tin đăng này có thể đã hết hạn hoặc đường dẫn không đúng.</p>
+            <p>Tin đăng này không tồn tại hoặc đã bị xóa khỏi CSDL.</p>
             <a href='" . ($project_folder ?? '') . "/trang-chu' style='display:inline-block; margin-top:20px; padding:10px 20px; background:var(--primary); color:white; border-radius:4px; font-weight:bold'>Về trang chủ</a>
           </div>";
     return;
 }
 
-// 4. CHUẨN HÓA DỮ LIỆU (MAPPING)
-// Logic: $found_item['key'] ?? 'Chưa có'
-// Nghĩa là: Nếu trong data.php có thì lấy, không có thì ghi "Chưa có"
+// 3. ⭐️ CHUẨN HÓA VÀ FALLBACK DỮ LIỆU TỪ CSDL ⭐️
+// Dùng toán tử ?? để kiểm tra NULL/thiếu dữ liệu, nếu thiếu thì điền "Chưa có"
 
-$product = [
-    // --- THÔNG TIN CƠ BẢN (Luôn có từ data.php) ---
-    "id"            => $found_item['id'],
-    "title"         => $found_item['name'],
-    "price"         => $found_item['price'],
-    "address"       => isset($found_item['loc']) ? "Khu vực " . $found_item['loc'] : "Đang cập nhật",
-    "date_posted"   => date("d/m/Y"), // Giả lập ngày hiện tại
-    "price_unit"    => "Thương lượng", // Đơn vị giá
+// Thông tin cơ bản và hiển thị
+$product['id'] = $product_raw['id'];
+$product['title'] = $product_raw['name'] ?? 'Đang cập nhật';
+$product['price'] = $product_raw['price'] ?? 'Liên hệ';
+$product['address'] = $product_raw['address'] ?? 'Khu vực ' . ($product_raw['loc'] ?? 'Chưa rõ');
+$product['price_unit'] = "Thương lượng";
+$product['date_posted'] = date("d/m/Y"); 
 
-    // --- THÔNG SỐ KỸ THUẬT (Dùng toán tử ?? để check) ---
-    "area"      => $found_item['area'] ?? 'Chưa có',
-    "use_area"  => $found_item['area'] ?? 'Chưa có', // Tạm dùng diện tích đất nếu ko có diện tích sàn
-    "dim"       => $found_item['dim'] ?? 'Chưa có',
-    "floors"    => $found_item['floors'] ?? 'Chưa có',
-    
-    "bed"       => $found_item['bed'] ?? 0,
-    "bath"      => $found_item['bath'] ?? 0,
-    
-    "direction" => $found_item['direction'] ?? 'Chưa có',
-    "balcony"   => $found_item['balcony'] ?? 'Chưa có',
-    "frontage"  => $found_item['frontage'] ?? 'Chưa có',
-    "road"      => $found_item['road'] ?? 'Chưa có',
-    "legal"     => $found_item['legal'] ?? 'Đang chờ sổ',
-    "furniture" => $found_item['furniture'] ?? 'Thỏa thuận',
+// Thông số kỹ thuật
+$product['area'] = $product_raw['area'] ?? 'Chưa có';
+$product['use_area'] = $product_raw['use_area'] ?? $product_raw['area'] ?? 'Chưa có';
+$product['dim'] = $product_raw['dim'] ?? 'Chưa có';
+$product['floors'] = $product_raw['floors'] ?? 'Chưa có';
+$product['bed'] = $product_raw['bed'] ?? 0;
+$product['bath'] = $product_raw['bath'] ?? 0;
+$product['direction'] = $product_raw['direction'] ?? 'Chưa có';
+$product['balcony'] = $product_raw['balcony'] ?? 'Chưa có';
+$product['frontage'] = $product_raw['frontage'] ?? 'Chưa có';
+$product['road'] = $product_raw['road'] ?? 'Chưa có';
+$product['legal'] = $product_raw['legal'] ?? 'Đang chờ sổ';
+$product['furniture'] = $product_raw['furniture'] ?? 'Thỏa thuận';
+$product['video_url'] = $product_raw['video_url'] ?? "https://www.youtube.com/embed/LXb3EKWsInQ";
 
-    // --- HÌNH ẢNH & MEDIA ---
-    // Nếu data gốc chỉ có 1 ảnh, ta nhân bản lên để Gallery không bị lỗi
-    "images" => [
-        $found_item['img'], 
-        $found_item['img'], // Ảnh phụ 1 (dùng lại ảnh chính)
-        $found_item['img']  // Ảnh phụ 2
-    ],
-    "video_url" => $found_item['video_url'] ?? "https://www.youtube.com/embed/LXb3EKWsInQ", // Video mặc định nếu thiếu
-
-    // --- MÔ TẢ & TIỆN ÍCH ---
-    "desc" => $found_item['desc'] ?? "<p>Hiện tại chưa có mô tả chi tiết cho bất động sản <strong>{$found_item['name']}</strong>. Quý khách vui lòng liên hệ trực tiếp để nhận thông tin mới nhất.</p>",
-    
-    "amenities" => $found_item['amenities'] ?? ["Đang cập nhật tiện ích..."],
-    
-    "nearby" => $found_item['nearby'] ?? [
-        ["name" => "Trung tâm hành chính", "dist" => "Gần bên"],
-        ["name" => "Chợ / Siêu thị", "dist" => "500m"]
-    ],
-
-    // --- MÔI GIỚI ---
-    "agent" => [
-        "name"  => "Hotline Hỗ Trợ",
-        "phone" => "0389.616.946",
-        "img"   => "https://images.unsplash.com/photo-1557862921-37829c790f19?w=200&q=80",
-        "zalo"  => "#"
-    ]
+// Nội dung lớn (đã được json_decode trong db.php)
+$product['desc'] = $product_raw['description'] ?? "<p>Hiện tại chưa có mô tả chi tiết cho bất động sản <strong>{$product['title']}</strong>. Quý khách vui lòng liên hệ trực tiếp để nhận thông tin mới nhất.</p>";
+$product['amenities'] = $product_raw['amenities'] ?? ["Đang cập nhật tiện ích..."];
+$product['nearby'] = $product_raw['nearby'] ?? [
+    ["name" => "Trung tâm hành chính", "dist" => "Gần bên"],
+    ["name" => "Chợ / Siêu thị", "dist" => "500m"]
 ];
+$product['images'] = $product_raw['images'] ?? [$product_raw['img']];
 
-// Lấy sản phẩm liên quan (Trừ sản phẩm đang xem)
+// Đảm bảo gallery ảnh có ít nhất 3 phần tử để tránh lỗi mảng images[1] và images[2]
+while (count($product['images']) < 3) {
+    $product['images'][] = $product_raw['img'];
+}
+
+// --- LẤY DỮ LIỆU LIÊN QUAN TỪ CSDL ---
+// Giả định loại sản phẩm đang xem là 'house' hoặc 'apartment'
+$type = $product_raw['type'] ?? 'house'; 
+// Hàm get_products_by_type() được định nghĩa trong db.php
+$related_products_raw = get_products_by_type($conn, $type); 
 $related_products = [];
-foreach($houses as $h) {
+
+// Lọc ra sản phẩm đang xem và lấy 4 cái đầu tiên
+foreach($related_products_raw as $h) {
     if($h['id'] != $product['id']) {
         $related_products[] = $h;
     }
     if(count($related_products) >= 4) break;
 }
+
+// --- MÔI GIỚI (Mock tạm vì chưa có bảng Agents) ---
+$product['agent'] = [
+    "name"  => "Trần Văn Chuyên",
+    "phone" => "0909.888.999",
+    "img"   => "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=200&q=80",
+    "zalo"  => "http://zalo.me/0909888999"
+];
 ?>
 
 <style>
-    /* CSS MỚI CHO BẢNG THÔNG SỐ (SPECS GRID) */
+    /* ... (CSS của bạn giữ nguyên) ... */
     .specs-section { background: #f8f9fa; border: 1px solid #eee; border-radius: 12px; padding: 25px; margin: 25px 0; }
     .specs-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px; row-gap: 30px; }
     .spec-item-v2 { display: flex; align-items: flex-start; gap: 15px; }
@@ -104,38 +95,28 @@ foreach($houses as $h) {
     .spec-content-v2 { display: flex; flex-direction: column; }
     .spec-label { font-size: 13px; color: #777; margin-bottom: 4px; }
     .spec-value { font-size: 15px; font-weight: 700; color: #222; }
-
-    /* Helper class để làm mờ chữ "Chưa có" */
     .text-muted-custom { color: #999 !important; font-weight: normal !important; font-style: italic; }
-
-    /* Các CSS cũ giữ nguyên */
     .photo-gallery { display: grid; grid-template-columns: 2fr 1fr; gap: 10px; height: 450px; border-radius: 12px; overflow: hidden; margin-bottom: 25px; cursor: pointer; }
     .photo-main img, .photo-sub img { width: 100%; height: 100%; object-fit: cover; transition: 0.3s; }
     .photo-sub { display: grid; grid-template-rows: 1fr 1fr; gap: 10px; }
     .photo-gallery img:hover { transform: scale(1.02); filter: brightness(1.1); }
-    
     .detail-container { display: grid; grid-template-columns: 2.5fr 1fr; gap: 40px; }
     .prop-header { border-bottom: 1px solid #eee; padding-bottom: 20px; margin-bottom: 20px; }
     .prop-title { font-size: 26px; font-weight: 800; color: #222; margin-bottom: 10px; line-height: 1.3; }
     .prop-price { font-size: 28px; font-weight: bold; color: #d0021b; }
-
     .content-block { margin-bottom: 40px; }
     .block-title { font-size: 18px; font-weight: 700; margin-bottom: 15px; color: #222; position: relative; padding-left: 15px; }
     .block-title::before { content: ''; position: absolute; left: 0; top: 4px; height: 16px; width: 4px; background: var(--accent); border-radius: 2px; }
-    
     .amenity-list { display: flex; flex-wrap: wrap; gap: 10px; }
     .amenity-tag { background: #fff; border: 1px solid #ddd; padding: 8px 15px; border-radius: 30px; font-size: 13px; color: #555; display: flex; align-items: center; gap: 8px; }
     .amenity-tag i { color: #28a745; }
-
     .nearby-table { width: 100%; border-collapse: collapse; font-size: 14px; }
     .nearby-table td { padding: 10px 0; border-bottom: 1px dashed #eee; }
-
     .sidebar-sticky { position: sticky; top: 100px; }
     .agent-box { background: white; border: 1px solid #eee; border-radius: 12px; padding: 25px; box-shadow: 0 5px 20px rgba(0,0,0,0.08); text-align: center; }
     .btn-action { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 12px; border-radius: 6px; font-weight: bold; margin-bottom: 10px; cursor: pointer; transition: 0.2s; text-decoration: none; }
     .btn-call { background: var(--primary); color: white; border: none; }
     .btn-zalo { background: #0068ff; color: white; border: none; }
-
     @media (max-width: 992px) { .detail-container { grid-template-columns: 1fr; } .specs-grid { grid-template-columns: repeat(2, 1fr); } }
     @media (max-width: 600px) { .photo-gallery { height: 250px; grid-template-columns: 1fr; } .photo-sub { display: none; } .specs-grid { grid-template-columns: 1fr; } }
 </style>
